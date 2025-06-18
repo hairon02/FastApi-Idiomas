@@ -8,7 +8,7 @@ class ActividadOracion(Base):
     Modelo SQLAlchemy para la tabla 'Actividad_Oraciones'.
     Contenido específico para actividades de tipo 'ORACION'.
     """
-    __tablename__ = "Actividad_Oraciones"
+    __tablename__ = "actividad_oraciones"
 
     id = Column(Integer, primary_key=True, index=True)
     id_actividad = Column(Integer, ForeignKey("actividades.id", ondelete="CASCADE"), nullable=False, unique=True)

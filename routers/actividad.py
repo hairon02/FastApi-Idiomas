@@ -26,3 +26,10 @@ async def create_actividad(actividad_create: ActividadCreate, db: Session = Depe
     db.commit()
     db.refresh(nueva_actividad)
     return nueva_actividad
+
+@actividad.get("/actividades/{actividad_id}", response_model=ActividadResponse)
+async def get_actividad(actividad_id: int, db: Session = Depends(get_db)):
+    actividad = db.query(Actividad).filter(Actividad.id == actividad_id).first()
+    if not actividad:
+        raise HTTPException(status_code=404, detail="Actividad no encontrada")
+    return actividad

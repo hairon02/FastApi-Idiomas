@@ -7,7 +7,7 @@ class ActividadVocabulario(Base):
     Modelo SQLAlchemy para la tabla 'Actividad_Vocabulario'.
     Contenido específico para actividades de tipo 'VOCABULARIO'.
     """
-    __tablename__ = "Actividad_Vocabulario"
+    __tablename__ = "actividad_vocabulario"
 
     id = Column(Integer, primary_key=True, index=True)
     id_actividad = Column(Integer, ForeignKey("actividades.id", ondelete="CASCADE"), nullable=False, unique=True)

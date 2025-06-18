@@ -9,10 +9,10 @@ class ProgresoVocabulario(Base):
     Modelo SQLAlchemy para la tabla 'Progreso_Vocabulario'.
     Rastrea el progreso de los usuarios con cada palabra del vocabulario.
     """
-    __tablename__ = "Progreso_Vocabulario"
+    __tablename__ = "progreso_vocabulario"
 
     id_usuario = Column(Integer, ForeignKey("usuarios.id", ondelete="CASCADE"), primary_key=True)
-    id_palabra = Column(Integer, ForeignKey("Actividad_Vocabulario.id", ondelete="CASCADE"), primary_key=True)
+    id_palabra = Column(Integer, ForeignKey("actividad_vocabulario.id", ondelete="CASCADE"), primary_key=True)
     # Usa el tipo ENUM de PostgreSQL
     estado_aprendizaje = Column(ENUM(EstadoVocabEnum, name="estado_vocab_enum", create_type=False), nullable=False, default=EstadoVocabEnum.NUEVA)
     aciertos = Column(Integer, nullable=False, default=0)

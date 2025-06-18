@@ -7,7 +7,7 @@ class ActividadVideo(Base):
     Modelo SQLAlchemy para la tabla 'Actividad_Video'.
     Contenido específico para actividades de tipo 'VIDEO'.
     """
-    __tablename__ = "Actividad_Video"
+    __tablename__ = "actividad_video"
 
     id = Column(Integer, primary_key=True, index=True)
     id_actividad = Column(Integer, ForeignKey("actividades.id", ondelete="CASCADE"), nullable=False, unique=True)

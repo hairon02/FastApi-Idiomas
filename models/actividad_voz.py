@@ -7,7 +7,7 @@ class ActividadVoz(Base):
     Modelo SQLAlchemy para la tabla 'Actividad_Voz'.
     Contenido específico para actividades de tipo 'VOZ'.
     """
-    __tablename__ = "Actividad_Voz"
+    __tablename__ = "actividad_voz"
 
     id = Column(Integer, primary_key=True, index=True)
     id_actividad = Column(Integer, ForeignKey("actividades.id", ondelete="CASCADE"), nullable=False, unique=True)

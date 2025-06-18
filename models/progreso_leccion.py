@@ -10,7 +10,7 @@ class ProgresoLeccion(Base):
     Modelo SQLAlchemy para la tabla 'Progreso_Lecciones'.
     Rastrea el progreso de los usuarios en las lecciones.
     """
-    __tablename__ = "Progreso_Lecciones"
+    __tablename__ = "progreso_lecciones"
 
     id_usuario = Column(Integer, ForeignKey("usuarios.id", ondelete="CASCADE"), primary_key=True)
     id_leccion = Column(Integer, ForeignKey("lecciones.id", ondelete="CASCADE"), primary_key=True)
