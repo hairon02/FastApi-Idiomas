@@ -9,9 +9,9 @@ from models.actividad_vocabulario import ActividadVocabulario
 from models.actividad_oracion import ActividadOracion
 from models.actividad_video import ActividadVideo
 from models.actividad_voz import ActividadVoz
+from routers.auth import get_current_user
 
-
-leccion = APIRouter()
+leccion = APIRouter(dependencies=[Depends(get_current_user)])
 
 @leccion.get("/lecciones", response_model=list[LeccionResponse])
 async def get_lecciones(db: Session = Depends(get_db)):

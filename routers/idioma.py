@@ -4,8 +4,9 @@ from db.database import get_db
 from models.idioma import Idioma
 from schemas.idioma import IdiomaResponse, IdiomaCreate
 from sqlalchemy import or_
+from routers.auth import get_current_user
 
-idioma = APIRouter()
+idioma = APIRouter(dependencies=[Depends(get_current_user)])
 
 @idioma.get("/idiomas", response_model=list[IdiomaResponse])
 async def get_idiomas(db: Session = Depends(get_db)):

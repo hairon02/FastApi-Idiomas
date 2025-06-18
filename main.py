@@ -11,7 +11,7 @@ from routers.actividad_video import actividad_video
 from routers.actividad_vocabulario import actividad_vocabulario
 from routers.actividad_voz import actividad_voz
 from routers.progreso import progreso_router
-
+from routers.ia import ia_router
 app = FastAPI()
 
 setup_cors(app)
@@ -27,7 +27,7 @@ app.include_router(actividad_video, tags=["actividad_video"])
 app.include_router(actividad_vocabulario, tags=["actividad_vocabulario"])
 app.include_router(actividad_voz, tags=["actividad_voz"])
 app.include_router(progreso_router, tags=["progreso"])
-
+app.include_router(ia_router, tags=["IA"])
 @app.get("/")
 def read_root():
     return {"mensaje": "Servidor FastAPI en ejecucion"}

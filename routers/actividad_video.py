@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from models.actividad_video import ActividadVideo
 from schemas.actividad_video import ActividadVideoCreate, ActividadVideoResponse
 from db.database import get_db
-
-actividad_video = APIRouter()
+from routers.auth import get_current_user
+actividad_video = APIRouter(dependencies=[Depends(get_current_user)])
 
 @actividad_video.get("/actividad_video", response_model=list[ActividadVideoResponse])
 def read_actividad_oracion_list(db: Session = Depends(get_db)):

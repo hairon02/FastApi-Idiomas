@@ -4,7 +4,9 @@ from db.database import get_db
 from models.nivel import Nivel
 from schemas.nivel import NivelCreate, NivelResponse
 from sqlalchemy import or_
-nivel = APIRouter()
+from routers.auth import get_current_user
+
+nivel = APIRouter(dependencies=[Depends(get_current_user)])
 
 @nivel.get("/niveles", response_model=list[NivelResponse])
 async def get_niveles(db: Session = Depends(get_db)):

@@ -6,8 +6,9 @@ from models.progreso_vocabulario import ProgresoVocabulario
 from schemas.enums import EstadoLeccionEnum, EstadoVocabEnum
 from datetime import datetime
 from pydantic import BaseModel
+from routers.auth import get_current_user
 
-progreso_router = APIRouter()
+progreso_router = APIRouter(dependencies=[Depends(get_current_user)])
 
 @progreso_router.get("/progreso/estado-actual")
 def obtener_estado_actual(user_id,db: Session = Depends(get_db)):

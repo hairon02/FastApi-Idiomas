@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 from models.actividad_oracion import ActividadOracion
 from schemas.actividad_oracion import ActividadOracionCreate, ActividadOracionResponse
 from db.database import get_db
+from routers.auth import get_current_user
 
-actividad_oracion = APIRouter()
+actividad_oracion = APIRouter(dependencies=[Depends(get_current_user)])
 
 @actividad_oracion.get("/actividad_oracion", response_model=list[ActividadOracionResponse])
 def read_actividad_oracion_list(db: Session = Depends(get_db)):

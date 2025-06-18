@@ -3,8 +3,10 @@ from sqlalchemy.orm import Session
 from models.actividad_voz import ActividadVoz
 from schemas.actividad_voz import ActividadVozCreate, ActividadVozResponse
 from db.database import get_db
+from routers.auth import get_current_user
 
-actividad_voz = APIRouter()
+actividad_voz = APIRouter(dependencies=[Depends(get_current_user)])
+
 @actividad_voz.get("/actividad_voz", response_model=list[ActividadVozResponse])
 def read_actividad_voz_list(db: Session = Depends(get_db)):
     db_actividad_voz = db.query(ActividadVoz).all()

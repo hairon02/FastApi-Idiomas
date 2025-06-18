@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from models.actividad_vocabulario import ActividadVocabulario
 from schemas.actividad_vocabulario import ActividadVocabularioCreate, ActividadVocabularioResponse
 from db.database import get_db
-
-actividad_vocabulario = APIRouter()
+from routers.auth import get_current_user
+actividad_vocabulario = APIRouter(dependencies=[Depends(get_current_user)])
 
 @actividad_vocabulario.get("/actividad_vocabulario", response_model=list[ActividadVocabularioResponse])
 def read_actividad_vocabulario_list(db: Session = Depends(get_db)):
