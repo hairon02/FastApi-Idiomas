@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Column, ForeignKey, Integer, String, Text
 from db.database import Base
 from sqlalchemy.sql.sqltypes import TIMESTAMP as timestamp
 from sqlalchemy.orm import relationship
@@ -11,7 +11,7 @@ class User(Base):
     email = Column(String(255), unique=True)
     hashed_password = Column(Text)
     fecha_registro = Column(timestamp(timezone=True))
-
+    id_idioma_actual = Column(Integer, ForeignKey("idiomas.id"), nullable=True)
     # Relación uno-a-muchos con ProgresoLeccion
     progreso_lecciones = relationship("ProgresoLeccion", back_populates="usuario")
     # Relación uno-a-muchos con ProgresoVocabulario

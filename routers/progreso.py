@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from db.database import get_db
+from models.nivel import Nivel
 from models.progreso_leccion import ProgresoLeccion
 from models.progreso_vocabulario import ProgresoVocabulario
 from schemas.enums import EstadoLeccionEnum, EstadoVocabEnum
@@ -8,48 +9,60 @@ from schemas.user import UserResponse  # Asegúrate de que esta importación est
 from datetime import datetime
 from pydantic import BaseModel
 from routers.auth import get_current_user
+from models.leccion import Leccion
 
 # Quitamos la dependencia de aquí
 progreso_router = APIRouter(tags=["progreso"])
 
 
 @progreso_router.get("/progreso/estado-actual")
-# Añadimos la dependencia directamente aquí
-def obtener_estado_actual(db: Session = Depends(get_db), current_user: UserResponse = Depends(get_current_user)):
-    # Buscamos el progreso usando el ID del usuario que nos da la dependencia
-    progreso_lecciones = db.query(ProgresoLeccion).filter(
+def obtener_estado_actual(current_user: UserResponse = Depends(get_current_user), db: Session = Depends(get_db)):
+    
+    if current_user.id_idioma_actual is None:
+        return {
+            "leccion_actual": None,
+            "vocabulario_aprendido": [],
+            "progreso_lecciones": {}
+        }
+
+    progreso_lecciones_db = db.query(ProgresoLeccion).filter(
         ProgresoLeccion.id_usuario == current_user.id
-    ).order_by(ProgresoLeccion.id_leccion).all()
+    ).all()
+
+    progreso_lecciones_map = {
+        progreso.id_leccion: progreso.estado.value 
+        for progreso in progreso_lecciones_db
+    }
 
     leccion_actual = None
-    progreso_actual = None
-    for progreso in progreso_lecciones:
-        if progreso.estado != EstadoLeccionEnum.COMPLETADA:
-            leccion_actual = progreso.leccion
-            progreso_actual = progreso
-            break
+    progreso_actual_obj = None
+    lecciones_del_idioma = db.query(Leccion).join(Nivel).filter(Nivel.id_idioma == current_user.id_idioma_actual).order_by(Leccion.id).all()
 
+    for leccion in lecciones_del_idioma:
+        estado = progreso_lecciones_map.get(leccion.id)
+        if estado != 'COMPLETADA':
+            leccion_actual = leccion
+            progreso_actual_obj = next((p for p in progreso_lecciones_db if p.id_leccion == leccion.id), None)
+            break
+            
+    # --- AQUÍ ESTÁ LA CORRECCIÓN ---
+    # Reemplazamos el .filter(...) por el filtro correcto
     vocabulario = db.query(ProgresoVocabulario).filter(
         ProgresoVocabulario.id_usuario == current_user.id
     ).all()
+    # --- FIN DE LA CORRECCIÓN ---
 
-    vocabulario_aprendido = []
-    for palabra in vocabulario:
-        vocabulario_aprendido.append({
-            "id_palabra": palabra.id_palabra,
-            "estado_aprendizaje": palabra.estado_aprendizaje,
-            "aciertos": palabra.aciertos,
-            "fallos": palabra.fallos
-        })
+    vocabulario_aprendido = [{"id_palabra": p.id_palabra, "estado_aprendizaje": p.estado_aprendizaje.value, "aciertos": p.aciertos, "fallos": p.fallos} for p in vocabulario]
 
     return {
         "leccion_actual": {
-            "id": leccion_actual.id if leccion_actual else None,
-            "titulo": leccion_actual.titulo if leccion_actual else None,
-            "estado": progreso_actual.estado if progreso_actual else None,
-            "ultima_actividad": progreso_actual.ultima_actividad if progreso_actual else None
+            "id": leccion_actual.id,
+            "titulo": leccion_actual.titulo,
+            "estado": progreso_actual_obj.estado.value if progreso_actual_obj else 'NO_INICIADA',
+            "ultima_actividad": progreso_actual_obj.ultima_actividad if progreso_actual_obj else 0
         } if leccion_actual else None,
-        "vocabulario_aprendido": vocabulario_aprendido
+        "vocabulario_aprendido": vocabulario_aprendido,
+        "progreso_lecciones": progreso_lecciones_map
     }
 
 

@@ -11,9 +11,9 @@ CREATE TABLE Idiomas (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE,
     codigo_iso VARCHAR(10) UNIQUE,
-    url_bandera VARCHAR(255)
+    url_bandera VARCHAR(255),
+    url_fondo_curso VARCHAR(255) -- <-- AÑADIMOS ESTA LÍNEA
 );
-
 -- Tabla para los niveles de cada idioma
 CREATE TABLE Niveles (
     id SERIAL PRIMARY KEY,
