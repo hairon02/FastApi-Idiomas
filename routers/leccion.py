@@ -76,6 +76,7 @@ def get_actividades(id_leccion: int, db: Session = Depends(get_db)):
             detalle = db.query(ActividadVocabulario).filter(ActividadVocabulario.id_actividad == actividad.id).first()
             if detalle:
                 contenido = {
+                    "id": detalle.id, # <--- AÑADE ESTA LÍNEA
                     "palabra": detalle.palabra,
                     "traduccion": detalle.traduccion,
                     "url_audio": detalle.url_audio
@@ -85,6 +86,7 @@ def get_actividades(id_leccion: int, db: Session = Depends(get_db)):
             detalle = db.query(ActividadOracion).filter(ActividadOracion.id_actividad == actividad.id).first()
             if detalle:
                 contenido = {
+                    "frase_origen": detalle.frase_origen,
                     "frase_correcta": detalle.frase_correcta,
                     "banco_palabras": detalle.banco_palabras
                 }
@@ -94,19 +96,25 @@ def get_actividades(id_leccion: int, db: Session = Depends(get_db)):
             if detalle:
                 contenido = {
                     "id_video_youtube": detalle.id_video_youtube,
-                    "palabra_clave": detalle.palabra_clave
+                    "descripcion": detalle.descripcion,
+                    "pregunta": detalle.pregunta,
+                    "opciones": detalle.opciones,
+                    "respuesta_correcta": detalle.respuesta_correcta
                 }
 
         elif actividad.tipo_actividad == TipoActividadEnum.VOZ:
             detalle = db.query(ActividadVoz).filter(ActividadVoz.id_actividad == actividad.id).first()
             if detalle:
                 contenido = {
+                    "id": detalle.id,
                     "frase_a_repetir": detalle.frase_a_repetir
                 }
 
         resultado.append({
+            "id": actividad.id, # El ID de la actividad en sí
+            "id_leccion": actividad.id_leccion, # <-- LA LÍNEA CLAVE QUE FALTABA
             "orden": actividad.orden,
-            "tipo": actividad.tipo_actividad,  # Usa el nombre correcto del campo
+            "tipo": actividad.tipo_actividad,
             "contenido": contenido
         })
 

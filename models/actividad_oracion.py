@@ -12,6 +12,7 @@ class ActividadOracion(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     id_actividad = Column(Integer, ForeignKey("actividades.id", ondelete="CASCADE"), nullable=False, unique=True)
+    frase_origen = Column(Text, nullable=False)
     frase_correcta = Column(Text, nullable=False)
     # JSONB para almacenar datos JSON, aquí una lista de palabras
     banco_palabras = Column(JSONB, nullable=False)

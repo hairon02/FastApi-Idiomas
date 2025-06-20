@@ -55,15 +55,20 @@ CREATE TABLE Actividad_Vocabulario (
 CREATE TABLE Actividad_Oraciones (
     id SERIAL PRIMARY KEY,
     id_actividad INTEGER NOT NULL UNIQUE REFERENCES Actividades(id) ON DELETE CASCADE,
+    frase_origen TEXT NOT NULL, -- <-- AÑADIMOS ESTA LÍNEA
     frase_correcta TEXT NOT NULL,
     banco_palabras JSONB NOT NULL
 );
 
+-- En database.sql
 CREATE TABLE Actividad_Video (
     id SERIAL PRIMARY KEY,
     id_actividad INTEGER NOT NULL UNIQUE REFERENCES Actividades(id) ON DELETE CASCADE,
     id_video_youtube VARCHAR(50) NOT NULL,
-    palabra_clave VARCHAR(100)
+    descripcion TEXT,
+    pregunta TEXT,
+    opciones JSONB,
+    respuesta_correcta TEXT
 );
 
 CREATE TABLE Actividad_Voz (

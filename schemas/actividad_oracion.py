@@ -6,6 +6,7 @@ class ActividadOracionBase(BaseModel):
     Esquema base para Actividad_Oraciones.
     """
     id_actividad: int
+    frase_origen: str
     frase_correcta: str
     banco_palabras: List[str] # Asumiendo que es una lista de strings para el JSONB
     model_config = ConfigDict(

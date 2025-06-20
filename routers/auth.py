@@ -16,7 +16,7 @@ from schemas.user import UserResponse
 #Clave secreta para firmar los tokens JWT
 SECRET_KEY = "700f96b3a3344fde518deaad16d75ff7294e666fefb4b41b47a13f05c420094c"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 10080
 
 # Configuración de Passlib (bcrypt)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

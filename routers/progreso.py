@@ -4,17 +4,19 @@ from db.database import get_db
 from models.progreso_leccion import ProgresoLeccion
 from models.progreso_vocabulario import ProgresoVocabulario
 from schemas.enums import EstadoLeccionEnum, EstadoVocabEnum
-from schemas.user import UserResponse
+from schemas.user import UserResponse  # Asegúrate de que esta importación esté
 from datetime import datetime
 from pydantic import BaseModel
 from routers.auth import get_current_user
 
-progreso_router = APIRouter(dependencies=[Depends(get_current_user)])
+# Quitamos la dependencia de aquí
+progreso_router = APIRouter(tags=["progreso"])
+
 
 @progreso_router.get("/progreso/estado-actual")
+# Añadimos la dependencia directamente aquí
 def obtener_estado_actual(db: Session = Depends(get_db), current_user: UserResponse = Depends(get_current_user)):
-    # Obtener la lección en progreso o la siguiente no iniciada
-    # Usamos current_user.id para obtener el ID del usuario autenticado
+    # Buscamos el progreso usando el ID del usuario que nos da la dependencia
     progreso_lecciones = db.query(ProgresoLeccion).filter(
         ProgresoLeccion.id_usuario == current_user.id
     ).order_by(ProgresoLeccion.id_leccion).all()
@@ -27,7 +29,6 @@ def obtener_estado_actual(db: Session = Depends(get_db), current_user: UserRespo
             progreso_actual = progreso
             break
 
-    # Obtener vocabulario aprendido
     vocabulario = db.query(ProgresoVocabulario).filter(
         ProgresoVocabulario.id_usuario == current_user.id
     ).all()
@@ -51,18 +52,19 @@ def obtener_estado_actual(db: Session = Depends(get_db), current_user: UserRespo
         "vocabulario_aprendido": vocabulario_aprendido
     }
 
+
 class ActualizarProgresoLeccionRequest(BaseModel):
     estado: EstadoLeccionEnum
     ultima_actividad: int
 
 @progreso_router.post("/progreso/lecciones/{id_leccion}")
-def actualizar_progreso_leccion(user_id: int, id_leccion: int, datos: ActualizarProgresoLeccionRequest, db: Session = Depends(get_db)):
-    progreso = db.query(ProgresoLeccion).filter_by(id_usuario=user_id, id_leccion=id_leccion).first()
+# Añadimos la dependencia directamente aquí
+def actualizar_progreso_leccion(id_leccion: int, datos: ActualizarProgresoLeccionRequest, db: Session = Depends(get_db), current_user: UserResponse = Depends(get_current_user)):
+    progreso = db.query(ProgresoLeccion).filter_by(id_usuario=current_user.id, id_leccion=id_leccion).first()
 
     if not progreso:
-        # Si no existe el progreso, crearlo
         progreso = ProgresoLeccion(
-            id_usuario=user_id,
+            id_usuario=current_user.id,
             id_leccion=id_leccion,
             estado=datos.estado,
             ultima_actividad=datos.ultima_actividad,
@@ -76,8 +78,8 @@ def actualizar_progreso_leccion(user_id: int, id_leccion: int, datos: Actualizar
 
     db.commit()
     db.refresh(progreso)
-
     return {"mensaje": "Progreso de la lección actualizado correctamente."}
+
 
 class ActualizarProgresoVocabRequest(BaseModel):
     id_palabra: int
@@ -85,14 +87,14 @@ class ActualizarProgresoVocabRequest(BaseModel):
     fallos: int = 0
     estado_aprendizaje: EstadoVocabEnum
 
-@progreso_router.post("/vocabulario")
-def actualizar_progreso_vocabulario(user_id: int, datos: ActualizarProgresoVocabRequest, db: Session = Depends(get_db)):
-    progreso = db.query(ProgresoVocabulario).filter_by(id_usuario=user_id, id_palabra=datos.id_palabra).first()
+@progreso_router.post("/progreso/vocabulario")
+# Añadimos la dependencia directamente aquí
+def actualizar_progreso_vocabulario(datos: ActualizarProgresoVocabRequest, db: Session = Depends(get_db), current_user: UserResponse = Depends(get_current_user)):
+    progreso = db.query(ProgresoVocabulario).filter_by(id_usuario=current_user.id, id_palabra=datos.id_palabra).first()
 
     if not progreso:
-        # Si no existe el progreso, crearlo
         progreso = ProgresoVocabulario(
-            id_usuario=user_id,
+            id_usuario=current_user.id,
             id_palabra=datos.id_palabra,
             estado_aprendizaje=datos.estado_aprendizaje,
             aciertos=datos.aciertos,
@@ -108,5 +110,4 @@ def actualizar_progreso_vocabulario(user_id: int, datos: ActualizarProgresoVocab
 
     db.commit()
     db.refresh(progreso)
-
     return {"mensaje": "Progreso de vocabulario actualizado correctamente."}
