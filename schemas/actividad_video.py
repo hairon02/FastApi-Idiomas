@@ -8,6 +8,7 @@ class ActividadVideoBase(BaseModel):
     id_actividad: int
     id_video_youtube: str
     palabra_clave: Optional[str] = None
+    url_video_cloudinary: Optional[str] = None
     model_config = ConfigDict(
         from_attributes = True # Para Pydantic v2+ (anteriormente orm_mode = True)
     )

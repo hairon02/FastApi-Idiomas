@@ -64,6 +64,7 @@ CREATE TABLE Actividad_Video (
     id_actividad INTEGER NOT NULL UNIQUE REFERENCES Actividades(id) ON DELETE CASCADE,
     id_video_youtube VARCHAR(50) NOT NULL,
     palabra_clave VARCHAR(100)
+    url_video_cloudinary TEXT
 );
 
 CREATE TABLE Actividad_Voz (
