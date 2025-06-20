@@ -4,6 +4,7 @@ from db.database import get_db
 from models.progreso_leccion import ProgresoLeccion
 from models.progreso_vocabulario import ProgresoVocabulario
 from schemas.enums import EstadoLeccionEnum, EstadoVocabEnum
+from schemas.user import UserResponse
 from datetime import datetime
 from pydantic import BaseModel
 from routers.auth import get_current_user
@@ -11,21 +12,24 @@ from routers.auth import get_current_user
 progreso_router = APIRouter(dependencies=[Depends(get_current_user)])
 
 @progreso_router.get("/progreso/estado-actual")
-def obtener_estado_actual(user_id,db: Session = Depends(get_db)):
+def obtener_estado_actual(db: Session = Depends(get_db), current_user: UserResponse = Depends(get_current_user)):
     # Obtener la lección en progreso o la siguiente no iniciada
-    progreso_leccion = db.query(ProgresoLeccion).filter(
-        ProgresoLeccion.id_usuario == user_id
+    # Usamos current_user.id para obtener el ID del usuario autenticado
+    progreso_lecciones = db.query(ProgresoLeccion).filter(
+        ProgresoLeccion.id_usuario == current_user.id
     ).order_by(ProgresoLeccion.id_leccion).all()
 
     leccion_actual = None
-    for progreso in progreso_leccion:
+    progreso_actual = None
+    for progreso in progreso_lecciones:
         if progreso.estado != EstadoLeccionEnum.COMPLETADA:
             leccion_actual = progreso.leccion
+            progreso_actual = progreso
             break
 
     # Obtener vocabulario aprendido
     vocabulario = db.query(ProgresoVocabulario).filter(
-        ProgresoVocabulario.id_usuario == user_id
+        ProgresoVocabulario.id_usuario == current_user.id
     ).all()
 
     vocabulario_aprendido = []
@@ -41,12 +45,11 @@ def obtener_estado_actual(user_id,db: Session = Depends(get_db)):
         "leccion_actual": {
             "id": leccion_actual.id if leccion_actual else None,
             "titulo": leccion_actual.titulo if leccion_actual else None,
-            "estado": progreso.estado if leccion_actual else None,
-            "ultima_actividad": progreso.ultima_actividad if leccion_actual else None
+            "estado": progreso_actual.estado if progreso_actual else None,
+            "ultima_actividad": progreso_actual.ultima_actividad if progreso_actual else None
         } if leccion_actual else None,
         "vocabulario_aprendido": vocabulario_aprendido
     }
-
 
 class ActualizarProgresoLeccionRequest(BaseModel):
     estado: EstadoLeccionEnum
